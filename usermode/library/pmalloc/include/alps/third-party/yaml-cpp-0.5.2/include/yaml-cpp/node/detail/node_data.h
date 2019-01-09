@@ -9,6 +9,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/utility.hpp>
+#include <boost/next_prior.hpp>
 #include <list>
 #include <map>
 #include <string>

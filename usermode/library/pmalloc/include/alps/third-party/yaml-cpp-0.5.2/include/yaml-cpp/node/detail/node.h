@@ -14,6 +14,7 @@
 #include "yaml-cpp/node/detail/node_ref.h"
 #include <set>
 #include <boost/utility.hpp>
+#include <boost/next_prior.hpp>
 
 namespace YAML {
 namespace detail {

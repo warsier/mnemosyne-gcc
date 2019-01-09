@@ -12,6 +12,7 @@
 #include "yaml-cpp/node/ptr.h"
 #include "yaml-cpp/node/detail/node_data.h"
 #include <boost/utility.hpp>
+#include <boost/next_prior.hpp>
 
 namespace YAML {
 namespace detail {
