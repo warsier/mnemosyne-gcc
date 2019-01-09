@@ -681,10 +681,12 @@ pmap_internal_abs(void *start, unsigned long long length, int prot, int flags,
 	PCM_WB_FENCE(NULL);
 	PCM_WB_FLUSH(NULL, &(tentry->start));
 	PCM_WB_FLUSH(NULL, &(tentry->size));
+	PMTest_isPersistent(tentry, sizeof(m_segtbl_entry_t));
 	flags_val = segtbl_entry_flags;
 	PM_EQU(tentry->flags, flags_val);  /* PCM STORE */
 	PCM_WB_FENCE(NULL);
 	PCM_WB_FLUSH(NULL, &(tentry->flags));
+	PMTest_isPersistent(tentry, sizeof(m_segtbl_entry_t));
 
 	/* Insert the entry into the ordered index */
 	segidx_insert_entry_ordered(m_segtbl.idx, new_ientry, 1);
@@ -810,6 +812,7 @@ segment_create_sections(m_segtbl_t *segtbl)
 			PM_EQU(tentry->flags, flags_val); /* PCM STORE */
 			PCM_WB_FENCE(NULL);
 			PCM_WB_FLUSH(NULL, &(tentry->flags));
+			PMTest_isPersistent(tentry, sizeof(m_segtbl_entry_t));
 		}
 
 	} /* end of list_for_each_entry */

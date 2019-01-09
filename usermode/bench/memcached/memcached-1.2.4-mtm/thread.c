@@ -273,10 +273,23 @@ static void setup_thread(LIBEVENT_THREAD *me) {
     cq_init(&me->new_conn_queue);
 }
 
+#define PMTEST
+
+#ifdef PMTEST
+#include "pmtest.h"
+extern void ***metadataVectorPtrArray;
+#endif
+
 /*
  * Worker thread: main event loop
  */
 static void* worker_libevent(void *arg) {
+#ifdef PMTEST
+    // PMTEST: register this thread in Metadata Manager
+    //printf("Regsiter Thread\n");
+    C_initThread();
+    metadataVectorPtr = metadataVectorPtrArray[thread_id];
+#endif
     LIBEVENT_THREAD *me = arg;
 
     /* Any per-thread setup can happen here; thread_init() will block until
@@ -643,6 +656,7 @@ void mt_stats_unlock() {
  * main_base Event base for main thread
  */
 void thread_init(int nthreads, struct event_base *main_base) {
+    //printf("@thread_init, nthreads=%d\n", nthreads);
     int         i;
 
     pthread_mutex_init(&cache_lock, NULL);
@@ -680,6 +694,7 @@ void thread_init(int nthreads, struct event_base *main_base) {
 
     /* Create threads after we've done all the libevent setup. */
     for (i = 1; i < nthreads; i++) {
+        //printf("@create_worker\n");
         create_worker(worker_libevent, &threads[i]);
     }
 

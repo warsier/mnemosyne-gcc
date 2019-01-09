@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -rf /mnt/pmem/*
 killall memcached
 bin=./build/bench/memcached/memcached-1.2.4-mtm/memcached
 
@@ -15,7 +16,7 @@ fi
 
 #scons --build-bench=memcached
 #ldd ./build/bench/memcached/memcached-1.2.4-mtm/memcached
-./build/bench/memcached/memcached-1.2.4-mtm/memcached -u root -p 11211 -l 127.0.0.1 -t 4 $trace &
+taskset -c 0-8 ./build/bench/memcached/memcached-1.2.4-mtm/memcached -u root -p 11211 -l 127.0.0.1 -t 4 #$trace &
 #./build/bench/memcached/memcached-1.2.4-mtm/memcached -u root -p 11211 -l 127.0.0.1 -t 4
 #./build/bench/memcached/memcached-1.2.4-mtm/memcached -u root -p 11211 -l 127.0.0.1 -t 1 
 #./build/bench/memcached/memcached-1.2.4-mtm/memcached -u root -p 11211 -l 127.0.0.1 -t 1 -vv

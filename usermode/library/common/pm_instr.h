@@ -24,6 +24,8 @@
 #include <debug.h>
 #include <string.h>
 
+#include "pmtest.h"
+
 #define LOC1 	__func__	/* str ["0"]: can be __func__, __FILE__ */	
 #define LOC2	__LINE__        /* int [0]  : can be __LINE__ */
 #define PM_CL_SIZE	64	/* Cache line size on x86-64 architecture */
@@ -178,6 +180,7 @@
                         sizeof((pm_dst)),           	\
                         LOC1,                   	\
                         LOC2);                  	\
+            PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst = y;                             	\
     })
 
@@ -190,6 +193,7 @@
                         sizeof((pm_dst)),               \
                         LOC1,                           \
                         LOC2);                          \
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst = y;                                 \
     })
 
@@ -202,6 +206,7 @@
                         sizeof((pm_dst)),               \
                         LOC1,                           \
                         LOC2);                          \
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst = y;                                 \
     })
 
@@ -215,6 +220,7 @@
                         sizeof((pm_dst)),           	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst |= y;                            	\
     })
 
@@ -227,6 +233,7 @@
                         sizeof((pm_dst)),           	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst &= y;                            	\
     })
 
@@ -239,6 +246,7 @@
                         sizeof((pm_dst)),           	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst += y;                            	\
     })
 
@@ -251,6 +259,7 @@
                         sizeof((pm_dst)),           	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(&(pm_dst)), sizeof((pm_dst)));	\
             pm_dst -= y;                            	\
     })
 
@@ -264,6 +273,7 @@
                         (unsigned long)sz,          	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(pm_dst), (sz)); \
             memset(pm_dst, val, sz);                	\
     }) 
 
@@ -276,6 +286,7 @@
                         (unsigned long)sz,          	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(pm_dst), (sz)); \
             memcpy(pm_dst, src, sz);                	\
     })              
 
@@ -288,6 +299,7 @@
                         (int)strlen((src)),    	    	\
                         LOC1,                   	\
                         LOC2);                  	\
+			PMTest_assign((void *)(pm_dst), (int)strlen((src))); \
             strcpy(pm_dst, src);                    	\
     })
 
@@ -302,6 +314,7 @@
                         LOC1,                   	\
                         LOC2                    	\
                     );                              	\
+			PMTest_assign((void *)(pm_dst), (copied)); \
             0;                                      	\
     })
 
@@ -405,6 +418,7 @@
                     LOC1,                       	\
                     LOC2                        	\
                 );                                  	\
+        PMTest_flush((void *)(pm_dst), count);       	\
     })
 
 #define PM_FLUSHOPT(pm_dst, count, done)               	\
@@ -418,6 +432,7 @@
                     LOC1,                       	\
                     LOC2                        	\
                 );                                  	\
+        PMTest_flush((void *)(pm_dst), count);       	\
     })
 
 #define PM_COMMIT()                                 	\
@@ -443,6 +458,7 @@
 			PM_FENCE_MARKER,     	    	\
                     	LOC1, 				\
 			LOC2);            		\
+        PMTest_fence();	\
     })
 
 #endif /* PM_INSTR_H */

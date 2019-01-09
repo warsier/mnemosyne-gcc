@@ -166,10 +166,12 @@ pwb_trycommit (mtm_tx_t *tx, int enable_isolation)
 					{
 						/* access is persistent -- flush, freud : why flush individual entries ? */
 						PCM_WB_FLUSH(tx->pcm_storeset, w->addr);
+						// printf("Flush_1: %llx\n", w->addr);
 						wbflush_cnt++;
 					}
 				} else {
 					PCM_WB_FLUSH(tx->pcm_storeset, w->addr);
+					// printf("Flush_2: %llx\n", w->addr);
 					wbflush_cnt++;
 				}
 			}	
@@ -179,7 +181,9 @@ pwb_trycommit (mtm_tx_t *tx, int enable_isolation)
 				ATOMIC_STORE_REL(w->lock, LOCK_SET_TIMESTAMP(t));
 			}	
 		}
+		//printf("addr1 = %llx\n", w->addr);
 		PCM_WB_FENCE(tx->pcm_storeset);
+		//PMTest_isPersistent(w->addr, PM_CL_SIZE);
 #ifdef _M_STATS_BUILD
 		m_stats_statset_increment(mtm_statsmgr, tx->statset, XACT, wbflush, wbflush_cnt);
 #endif		

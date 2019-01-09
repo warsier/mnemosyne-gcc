@@ -30,12 +30,20 @@ benchEnv.Append(LIBS = [mcoreLibrary])
 benchEnv.Append(LIBS = [pmallocLibrary])
 benchEnv.Append(LIBS = ['pthread'])
 benchEnv.Append(LIBS = ['alps'])
+benchEnv.Append(LIBS = ['g'])
 benchEnv.Append(LIBPATH = ['#library/pmalloc/include/alps/build/src'])
 
 # RPATH is the path for library search during runtime.
 # It is baked into the executable so you don't need the 
 # LD_LIBRARY_PATH crap.
 benchEnv.Append(RPATH = ['library/pmalloc/include/alps/build/src'])
+
+#### ADDED_BY_PMTEST ####
+benchEnv.Append(CPPPATH = ['#../../../pmtest/include'])
+benchEnv.Append(LIBS = ['pmtest'])
+benchEnv.Append(LIBPATH = ['#../../../pmtest/build/libs'])
+benchEnv.Append(RPATH = ['../../../pmtest/build/libs'])
+#### END_ADDED_BY_PMTEST ####
 
 Export('benchEnv')
 

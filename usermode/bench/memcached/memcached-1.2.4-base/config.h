@@ -74,10 +74,10 @@
 #define PACKAGE_VERSION "1.2.4"
 
 /* Define to 1 if you have the ANSI C header files. */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Define this if you want to use pthreads */
-#define USE_THREADS
+/* #undef USE_THREADS */
 
 /* Version number of package */
 #define VERSION "1.2.4"

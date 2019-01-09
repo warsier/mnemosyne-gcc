@@ -42,6 +42,13 @@ if buildEnv['BUILD_STATS'] == True:
 if mainEnv['ENABLE_FTRACE'] == True:
 	buildEnv.Append(CCFLAGS = '-D_ENABLE_FTRACE')
 
+#### ADDED_BY_PMTEST ####
+buildEnv.Append(CPPPATH = ['#../../../pmtest/include'])
+buildEnv.Append(LIBS = ['pmtest'])
+buildEnv.Append(LIBPATH = ['#../../../pmtest/build/libs'])
+buildEnv.Append(RPATH = ['#../../../pmtest/build/libs'])
+#### END_ADDED_BY_PMTEST ####
+
 COMMON_SRC = [
               ('src/config_generic', '../common/config_generic.c'),
               ('src/debug', '../common/debug.c'), 

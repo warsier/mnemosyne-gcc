@@ -8,6 +8,13 @@ buildEnv = mnemosyne.Environment(mainEnv)
 buildEnv.Append(CCFLAGS = ['-fPIC'])
 buildEnv.Append(CPPPATH = ['#library/common'])
 
+#### ADDED_BY_PMTEST ####
+buildEnv.Append(CPPPATH = ['#../../../pmtest/include'])
+buildEnv.Append(LIBS = ['pmtest'])
+buildEnv.Append(LIBPATH = ['#../../../pmtest/build/libs'])
+buildEnv.Append(RPATH = ['#../../../pmtest/build/libs'])
+#### END_ADDED_BY_PMTEST ####
+
 
 SRC = Split("""
             debug.c

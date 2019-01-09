@@ -118,6 +118,16 @@ static struct event_base *main_base;
 
 static int *buckets = 0; /* bucket->generation array for a managed instance */
 
+#define PMTEST
+
+#ifdef PMTEST
+#include "pmtest.h"
+#define METADATA_MAX 50000
+void *pmtest_instance;
+void ***metadataVectorPtrArray;
+
+#endif
+
 #define REALTIME_MAXDELTA 60*60*24*30
 /*
  * given time value that's either unix time or delta from current unix time, return
@@ -2362,6 +2372,7 @@ static void drive_machine(conn *c) {
             stop = true;
             break;
         }
+
     }
     //fprintf(stderr, "%s : stop, tid : %d \n", __func__, syscall(SYS_gettid));
     return;
@@ -2397,9 +2408,43 @@ void event_handler(const int fd, const short which, void *arg) {
 	mtrace_enable_set(mtrace_record_ascope, "ntrace");
     }
     */
+#ifdef PMTEST
+    //PMTEST
+    PMTest_START;
+    //metadataPtr = metadataVectorPtr[pmtest_cur_idx];
+    //pmtest_cur_idx++;
+    C_getNewMetadataPtr();
+#endif
+    //printf("drive_machine in thread %d\n", C_getThreadID());
 
     drive_machine(c);
 
+#ifdef PMTEST
+    //printf("execVeri in thread %d\n", C_getThreadID());
+    C_execVeri(pmtest_instance, metadataPtr);
+
+    // enforce processing all metadata when full
+    if (pmtest_cur_idx >= METADATA_MAX)
+    {
+        //printf("@ pmtest clean metadata start 1\n");
+        C_getVeri(pmtest_instance, (void *)0);
+        //printf("@ pmtest clean metadata complete 1\n");
+        // delete all metadata vectors
+        int i;
+        for (i = 0; i < METADATA_MAX; i++) {
+            C_deleteMetadataVector(metadataVectorPtr[i]);
+        }
+		// recreate metadata vector and reset index
+        for (i = 0; i < METADATA_MAX; i++) {
+            metadataVectorPtr[i] = C_createMetadataVector();
+        }
+        metadataPtr = metadataVectorPtr[0];
+        //printf("metadataPtr=%p\n", metadataPtr);
+
+        pmtest_cur_idx = 0;
+    }
+    PMTest_END;
+#endif
     /*
     if(trace)
     {
@@ -2920,6 +2965,28 @@ int main (int argc, char **argv) {
         }
     }
 
+#ifdef PMTEST
+    //PMTEST: create instance
+    pmtest_instance = C_createVeriInstance();
+
+    // create metadata vector array
+    metadataVectorPtrArray = malloc(settings.num_threads * sizeof(void *));
+    int i, j;
+    for (i = 0; i < settings.num_threads; ++i) {
+        metadataVectorPtrArray[i] = malloc(METADATA_MAX * sizeof(void *));
+        for (j = 0; j < METADATA_MAX; j++) {
+            metadataVectorPtrArray[i][j] = C_createMetadataVector();
+            //assert(metadataVectorPtrArray[i][j]);
+        }
+    }
+    printf("Created metadata vectors for %d threads\n", settings.num_threads);
+
+    // init the master thread
+    C_initThread();
+    metadataVectorPtr = metadataVectorPtrArray[thread_id];
+
+#endif
+
     if (maxcore != 0) {
         struct rlimit rlim_new;
         /*
@@ -3027,7 +3094,6 @@ int main (int argc, char **argv) {
         }
     }
 
-
     /* initialize main thread libevent instance */
     main_base = event_init();
 
@@ -3079,6 +3145,7 @@ int main (int argc, char **argv) {
     }
     /* start up worker threads if MT mode */
     thread_init(settings.num_threads, main_base);
+
     /* save the PID in if we're a daemon, do this after thread_init due to
        a file descriptor handling bug somewhere in libevent */
     if (daemonize)
@@ -3106,5 +3173,21 @@ int main (int argc, char **argv) {
     /* remove the PID file if we're a daemon */
     if (daemonize)
         remove_pidfile(pid_file);
+
+#ifdef PMTEST
+    //PMTEST: Delete metadata vector and pmtest instance
+    // PMTest_END;
+
+    for (i = 0; i < settings.num_threads; ++i) {
+        for (j = 0; j < METADATA_MAX; ++j) {
+            if (metadataVectorPtrArray[i][j] != NULL)
+                C_deleteMetadataVector(metadataVectorPtrArray[i][j]);
+            else
+                break;
+        }
+    }
+    C_deleteVeriInstance(pmtest_instance);
+#endif
+
     return 0;
 }

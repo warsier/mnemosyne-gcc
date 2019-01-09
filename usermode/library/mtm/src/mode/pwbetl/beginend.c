@@ -33,13 +33,16 @@
 #include "pwb_i.h"
 #include "mode/pwb-common/beginend-bits.h"
 
+void *veriInstance;
+
 
 uint32_t
 mtm_pwbetl_beginTransaction_internal (mtm_tx_t *tx, 
                                    uint32_t prop, 
                                    _ITM_srcLocation *srcloc, jmp_buf **__env)
 {
-	PM_START_TX();
+	//PMTest_CHECKER_START;
+	//PM_START_TX();
 	return beginTransaction_internal (tx, prop, srcloc, 1, __env);
 }
 
@@ -115,6 +118,8 @@ mtm_pwbetl_commitTransaction(mtm_tx_t *tx, const _ITM_srcLocation *loc)
 		                      // quiescence support.
 	}							  
 	PM_END_TX();
+	PMTest_isPersistent(tx, sizeof(*tx));
+	//PMTest_CHECKER_END;
 	MTM_DEBUG_PRINT("==> mtm_pwb_commitTransaction(%p): DONE\n", tx);
 }
 
